@@ -11,7 +11,7 @@ import (
 
 var (
 	isRunning = true
-	sigChan = make(chan os.Signal, 1)
+	sigChan   = make(chan os.Signal, 1)
 )
 
 func StartProc(binaryPath string) {
@@ -21,8 +21,10 @@ func StartProc(binaryPath string) {
 	signal.Notify(sigChan, os.Interrupt)
 
 	go func() {
-		<-sigChan
-		isRunning = false
+		for {
+			<-sigChan
+			isRunning = false
+		}
 	}()
 
 	cmd := exec.Command(binaryPath)
@@ -48,7 +50,7 @@ func StartProc(binaryPath string) {
 	}
 
 	fmt.Println("Exiting...")
-	
+
 	if err := cmd.Wait(); err != nil {
 		log.Fatal("cmd.Wait err:", err)
 	}
